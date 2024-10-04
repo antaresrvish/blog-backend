@@ -5,7 +5,9 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migration:generate": "drizzle-kit generate",
+    "migration:push": "node -r esbuild-register src/db/migrate.js"
   },
   "repository": {
     "type": "git",
