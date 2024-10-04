@@ -1,9 +1,12 @@
-import { integer, pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const postSchema = pgTable('posts', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity({increment:1, minValue:1, maxValue:2147483647, startWith:1, cache:1}),
-  title: varchar('title', { length: 255 }).notNull(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
   content: text('content').notNull(),
+  tags: text('tags').array().notNull(),
+  author: text('author').notNull(),
   imageBlobUrl: text('image_blob_url').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow()
 });

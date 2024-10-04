@@ -20,8 +20,11 @@ app.get('/posts', async (req, res) => {
             if(post.imageBlobUrl) {
                 const base64Data = `data:image/png;base64,${post.imageBlobUrl}`;
                 const buffer = Buffer.from(base64Data.split(',')[1], 'base64');
+                console.log(buffer);
                 const blob = new Blob([buffer], { type: 'image/png' });
+                console.log(blob);
                 imageBlobUrl = URL.createObjectURL(blob);
+                console.log(imageBlobUrl);
             }
             return {
                 ...post,
@@ -39,7 +42,10 @@ app.post('/posts', async (req, res) => {
     try{
         await db.insert(postSchema).values({
             title: req.body.title,
+            description: req.body.description,
             content: req.body.content,
+            tags: req.body.tags,
+            author: req.body.author,
             imageBlobUrl: req.body.imageBlobUrl,
         });
         res.status(200).send('OK');
@@ -58,6 +64,12 @@ app.delete('/posts/:id', async (req, res) => {
         console.error(ex);
         res.status(500).send('SERVER ERROR');
     }
+});
+
+app.get('/posts/:postId/comments', async (req, res) => {
+    const id = req.params.postId;
+    const comments = await db.select().from(commentSchema).where(eq(commentSchema.postId, id));
+    res.status(200).json(comments);
 });
 
 app.post('/posts/:postId/comments', async (req, res) => {
