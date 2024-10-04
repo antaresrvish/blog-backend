@@ -1,5 +1,5 @@
 {
-  "id": "183408db-c3c5-4ed7-a59b-d7f11d72944a",
+  "id": "cfc1bc16-f2f2-4bfa-84f8-6e42c3cf7a1d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -12,7 +12,18 @@
           "name": "id",
           "type": "integer",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "comments_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
         },
         "post_id": {
           "name": "post_id",
