@@ -4,6 +4,8 @@ import { postSchema, commentSchema, userSchema } from '../schemas/schema.js'
 import { eq } from 'drizzle-orm';
 import multer from 'multer';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import auth, {authorizeRole} from '../middleware/auth.js';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -22,21 +24,39 @@ router.post('/register', async (req, res) => {
     try{
         const {username, password} = req.body;
         const salts = 10;
-        const hashedPass = await bcrypt.hash(password, salts);
-
+        const hashedPass = await bcrypt.hash(password, salts);      
         await db.insert(userSchema).values({
             username: username,
             password: hashedPass,
             role: 'user'
         });
-        res.status(201).send('REGISTER OK');
+        console.log(hashedPass);
     } catch(ex){
         console.log(ex);
-        res.status(500).send('REGISTER FAILED');
+        res.status(500).json({ error:'REGISTER FAILED'});
     }
 });
 
-router.get('/posts', async (req, res) => {
+router.post('/login', async (req, res) => {
+    try{
+        const {username, password} = req.body;
+        const user = await db.select().from(userSchema).where(eq(userSchema.username, username));
+        if(user.length === 0 ){
+            return res.status(401).json({ error: 'INVALID USERNAME OR PASSWORD'});
+        }
+        const isPasswordValid = await bcrypt.compare(password, user[0].password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'INVALID PASSWORD'});
+        }
+        const token = jwt.sign({ userId: user[0].id, role: user[0].role }, 'mysecretkey', {expiresIn: '24h'});
+        res.status(200).json({ token });
+    } catch(ex){
+        console.log(ex);
+        res.status(500).json({ message: 'LOGIN FAILED.'})
+    }
+})
+
+router.get('/posts', auth, async (req, res) => {
     try{
         const posts = await db.select().from(postSchema);
         const Mposts = posts.map(post => {
@@ -59,11 +79,11 @@ router.get('/posts', async (req, res) => {
         res.status(200).json(Mposts);
     } catch(ex) {
         console.error(ex);
-        res.status(500).send('SERVER ERROR')
+        res.status(500).json({ error: 'SERVER ERROR'});
     }
 });
 
-router.post('/posts',upload.fields([
+router.post('/posts', auth, authorizeRole(['admin']), upload.fields([
     { name: 'imageBlobUrl', maxCount: 1 }
   ]), async (req, res) => {
     try{
@@ -83,51 +103,51 @@ router.post('/posts',upload.fields([
             author: req.body.author,
             imageBlobUrl: url
         });
-        res.status(200).send('OK');
+        res.status(200).json({ message: 'OK'});
     } catch(ex) {
         console.error(ex);
-        res.status(500).send('SERVER ERROR');
+        res.status(500).json({ error: 'SERVER ERROR'});
     }
 });
 
-router.delete('/posts/:id', async (req, res) => {
+router.delete('/posts/:id', auth, authorizeRole(['admin']), async (req, res) => {
     const id = req.params.id;
     try {
         const delRow = await db.delete(postSchema).where(eq(postSchema.id, id));
-        delRow.rowCount > 0 ? res.status(204).send('POST DELETE OK') : res.status(404).send('CANT FIND POST');
+        delRow.rowCount > 0 ? res.status(204).json({ message: 'POST DELETE OK'}) : res.status(404).json({ error: 'CANT FIND POST'});
     } catch(ex) {
         console.error(ex);
-        res.status(500).send('SERVER ERROR');
+        res.status(500).json({ error: 'SERVER ERROR'});
     }
 });
 
-router.get('/posts/:postId/comments', async (req, res) => {
+router.get('/posts/:postId/comments', auth, authorizeRole(['admin']), async (req, res) => {
     const id = req.params.postId;
     const comments = await db.select().from(commentSchema).where(eq(commentSchema.postId, id));
     res.status(200).json(comments);
 });
 
-router.post('/posts/:postId/comments', async (req, res) => {
+router.post('/posts/:postId/comments', auth, authorizeRole(['admin']), async (req, res) => {
     try{
         await db.insert(commentSchema).values({
             postId: req.params.postId,
             text: req.body.text
         });
-        res.status(200).send('OK');
+        res.status(200).json({ message: 'OK'});
     } catch(ex) {
         console.error(ex);
-        res.status(500).send('SERVER ERROR')
+        res.status(500).json({error: 'SERVER ERROR'})
     }
 });
 
-router.delete('/comments/:id', async (req, res) => {
+router.delete('/comments/:id', auth, authorizeRole(['admin']), async (req, res) => {
     const id = req.params.id;
     try{
         const delCom = await db.delete(commentSchema).where(eq(commentSchema.id, id));
-        delCom.rowCount > 0 ? res.status(204).send('COM DELETE OK') : res.status(404).send('CANT FIND COMMENT');
+        delCom.rowCount > 0 ? res.status(204).json({ message:'COM DELETE OK'}) : res.status(404).json({ error: 'CANT FIND COMMENT'});
     } catch(ex){
         console.error(ex);
-        res.status(500).send('SERVER ERROR');
+        res.status(500).json({ error:'SERVER ERROR'});
     }
 });
 
