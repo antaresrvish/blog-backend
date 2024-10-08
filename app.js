@@ -5,7 +5,7 @@ import posts from './src/routes/posts.js';
 import comments from './src/routes/comments.js';
 import likes from './src/routes/likes.js';
 import swaggerUi from 'swagger-ui-express'
-import swaggerSpec from './utils/swagger.js'
+import swaggerSpec from './utils/swagger-output.json' with { type: "json"}
 
 const app = express();
 const port = 3000;

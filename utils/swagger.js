@@ -1,15 +1,13 @@
-import swaggerJSDoc from "swagger-jsdoc";
+import swaggerAutogen from 'swagger-autogen';
 
-const options = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Blog Backend',
-      version: '1.0.0',
-      description: 'API documentation for blog backend',
-    },
+const doc = {
+  info: {
+    title: 'Backend for blog',
+    description: 'test'
   },
+  host: 'localhost:3000',
   apis: ['./src/routes/register.js', './src/routes/login.js', './src/routes/posts.js', './src/routes/comments.js', './src/routes/likes.js'],
 };
-const swaggerSpec = swaggerJSDoc(options);
-export default swaggerSpec;
+const outputFile = './swagger-output.json';
+const routes = ['../app.js'];
+swaggerAutogen()(outputFile, routes, doc);
