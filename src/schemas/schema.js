@@ -25,4 +25,11 @@ export const userSchema = pgTable('users', {
   username: text('username').notNull(),
   password: text('password').notNull(),
   role: userType('role').default('user').notNull(),
-})
+});
+
+export const likeSchema = pgTable('likes', {
+  id: integer('id').primaryKey().generatedAlwaysAsIdentity({increment: 1, minValue: 1, maxValue: 2147483647, startWith:1, cache:1}),
+  userId: integer('user_id').notNull().references(() => userSchema.id, {onDelete: 'cascade'}),
+  postId: integer('post_id').notNull().references(() => postSchema.id, {onDelete: 'cascade'}),
+  createdAt: timestamp('created_at').notNull().defaultNow()
+});
