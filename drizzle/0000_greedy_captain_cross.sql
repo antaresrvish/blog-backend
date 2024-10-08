@@ -1,3 +1,9 @@
+DO $$ BEGIN
+ CREATE TYPE "public"."role" AS ENUM('user', 'admin');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "comments" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "comments_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"post_id" integer NOT NULL,
@@ -20,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "users_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"username" text NOT NULL,
 	"password" text NOT NULL,
-	"role" text NOT NULL
+	"role" "role" DEFAULT 'user' NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN

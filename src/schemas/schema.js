@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, pgEnum } from 'drizzle-orm/pg-core';
 
 export const postSchema = pgTable('posts', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity({increment:1, minValue:1, maxValue:2147483647, startWith:1, cache:1}),
@@ -18,9 +18,11 @@ export const commentSchema = pgTable('comments', {
     createdAt: timestamp('created_at').notNull().defaultNow()
 });
 
+export const userType = pgEnum('role', ['user', 'admin']);
+
 export const userSchema = pgTable('users', {
   id: integer('id').primaryKey().generatedAlwaysAsIdentity({increment:1, minValue:1, maxValue:2147483647, startWith:1, cache:1}),
   username: text('username').notNull(),
   password: text('password').notNull(),
-  role: text('role').notNull()
+  role: userType('role').default('user').notNull(),
 })

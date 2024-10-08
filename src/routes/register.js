@@ -12,9 +12,9 @@ router.post('/register', async (req, res) => {
         await db.insert(userSchema).values({
             username: username,
             password: hashedPass,
-            role: 'user'
         });
         console.log(hashedPass);
+        res.status(200).json({ message: 'REGISTER OK'});
     } catch(ex){
         console.log(ex);
         res.status(500).json({ error:'REGISTER FAILED'});

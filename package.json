@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "migration:generate": "drizzle-kit generate",
-    "migration:push": "node -r esbuild-register src/db/migrate.js"
+    "migration:push": "node -r esbuild-register src/db/migrate.js",
+    "db:studio": "drizzle-kit studio"
   },
   "repository": {
     "type": "git",

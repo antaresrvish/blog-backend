@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../db/index.js';
-import { postSchema, commentSchema, userSchema } from '../schemas/schema.js'
+import { commentSchema } from '../schemas/schema.js'
 import { eq } from 'drizzle-orm';
 import auth, {authorizeRole} from '../middleware/auth.js';
 

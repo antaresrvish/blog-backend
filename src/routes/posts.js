@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../db/index.js';
-import { postSchema, commentSchema, userSchema } from '../schemas/schema.js'
+import { postSchema } from '../schemas/schema.js'
 import { eq } from 'drizzle-orm';
 import multer from 'multer';
 import auth, {authorizeRole} from '../middleware/auth.js';
@@ -20,13 +20,9 @@ router.get('/posts', auth, async (req, res) => {
             let imageBlobUrl = null;
             if(post.imageBlobUrl) {
                 const base64Data = `${post.imageBlobUrl}`;
-                console.log(base64Data);
                 const buffer = Buffer.from(base64Data, 'base64');
-                console.log(buffer);
                 const blob = new Blob([buffer], { type: 'image/png' });
-                console.log(blob);
                 imageBlobUrl = URL.createObjectURL(blob);
-                console.log(imageBlobUrl);
             }
             return {
                 ...post,
@@ -45,13 +41,9 @@ router.post('/posts', auth, authorizeRole(['admin']), upload.fields([
   ]), async (req, res) => {
     try{
         const imageFile = req.files['imageBlobUrl'];
-        console.log(imageFile);
         const blob = new Blob([imageFile[0].buffer], {type: imageFile[0].mimetype});
-        console.log(blob);
         const base64 = await blobToBase64(blob);
         const url = `data:${imageFile[0].mimetype};base64,${base64}`;
-        console.log(url);
-
         await db.insert(postSchema).values({
             title: req.body.title,
             description: req.body.description,
