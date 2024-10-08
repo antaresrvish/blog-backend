@@ -1,10 +1,16 @@
 import express from 'express';
-import routes from './src/routes/index.js'
+import login from './src/routes/login.js'
+import register from './src/routes/register.js'
+import posts from './src/routes/posts.js'
+import comments from './src/routes/comments.js'
 const app = express();
 const port = 3000;
 
 app.use(express.json())
-app.use('/', routes);
+app.use('/', login);
+app.use('/', register);
+app.use('/', posts);
+app.use('/', comments);
 
 app.listen(port, () => {
     console.log(`test on ${port}`);
