@@ -4,6 +4,28 @@ import db from '../db/index.js';
 import { userSchema } from '../schemas/schema.js'
 const router = express.Router();
 
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a user.
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         schema:
+ *           type: string
+*            required: true
+*            properties:
+*           
+ *         description: username
+ *          
+ *     responses:
+ *       '200':
+ *         description: A successful response
+ *       '500':
+ *         description: Internal server error
+ */
+
 router.post('/register', async (req, res) => {
     try{
         const {username, password} = req.body;
