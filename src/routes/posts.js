@@ -16,20 +16,7 @@ const blobToBase64 = async (blob) => {
 router.get('/posts', auth, async (req, res) => {
     try{
         const posts = await db.select().from(postSchema);
-        const Mposts = posts.map(post => {
-            let imageBlobUrl = null;
-            if(post.imageBlobUrl) {
-                const base64Data = `${post.imageBlobUrl}`;
-                const buffer = Buffer.from(base64Data, 'base64');
-                const blob = new Blob([buffer], { type: 'image/png' });
-                imageBlobUrl = URL.createObjectURL(blob);
-            }
-            return {
-                ...post,
-                imageBlobUrl
-            }
-        });
-        res.status(200).json(Mposts);
+        res.status(200).json(posts);
     } catch(ex) {
         console.error(ex);
         res.status(500).json({ error: 'SERVER ERROR'});
